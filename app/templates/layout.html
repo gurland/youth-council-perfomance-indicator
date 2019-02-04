@@ -1,0 +1,25 @@
+<!doctype html>
+<head lang="ru">
+    <meta charset="utf-8">
+    {% block head %}
+    {% endblock %}
+
+{#    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">#}
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+          integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+
+    <!-- Add custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+
+    <!-- Add custom JavaScript -->
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
+
+</head>
+
+
+{% block body %}
+{% endblock %}

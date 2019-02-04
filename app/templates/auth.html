@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <title>Авторизація</title>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="auth">
+            <form action="{{ url_for('login') }}" method="post">
+                <input type="text" placeholder="Введіть код" name="code" required>
+
+                 <div class="flushed-messages">
+                    {% for message in get_flashed_messages() %}
+                        <p id="sys-messages">
+                            {{message}}
+                        </p>
+                    {% endfor %}
+                </div>
+
+                <br><button type="submit">Увійти</button>
+            </form>
+
+
+        </div>
+
+    </div>
+
+{% endblock %}

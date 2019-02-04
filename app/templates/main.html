@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <title>Надіслати звіт</title>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="send-report">
+            <form action="{{ url_for('add_activity') }}" method="post">
+                <p>
+                    <input type="radio" name="activity-type" value="organized" id="rad1" checked>
+                    <label for="rad1">Організував, провів, зробив</label>
+                </p>
+
+                <p>
+                    <input type="radio" name="activity-type" id="rad2" value="collaborated">
+                    <label for="rad2">Долучився</label>
+                </p>
+
+                <p>
+                    <input type="radio" name="activity-type" id="rad3" value="visited">
+                    <label for="rad3">Відвідав</label>
+                </p>
+
+                <p>
+                    <input type="text" placeholder="Назва" name="name" required>
+                </p>
+
+                <p>
+                    <textarea placeholder="Опис" name="name" required></textarea>
+                </p>
+
+                <p>
+                    <input type="date" name="date" required>
+                </p>
+
+                 <div class="flushed-messages">
+                    {% for message in get_flashed_messages() %}
+                        <p id="sys-messages">
+                            {{message}}
+                        </p>
+                    {% endfor %}
+                </div>
+
+                <br><button type="submit">Надіслати звіт</button>
+            </form>
+
+
+        </div>
+
+    </div>
+{% endblock %}
