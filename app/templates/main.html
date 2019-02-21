@@ -9,17 +9,17 @@
         <div class="send-report">
             <form action="{{ url_for('add_activity') }}" method="post">
                 <p>
-                    <input type="radio" name="activity-type" value="organized" id="rad1" checked>
+                    <input type="radio" name="activity_type" value="organized" id="rad1" checked>
                     <label for="rad1">Організував, провів, зробив</label>
                 </p>
 
                 <p>
-                    <input type="radio" name="activity-type" id="rad2" value="collaborated">
+                    <input type="radio" name="activity_type" id="rad2" value="collaborated">
                     <label for="rad2">Долучився</label>
                 </p>
 
                 <p>
-                    <input type="radio" name="activity-type" id="rad3" value="visited">
+                    <input type="radio" name="activity_type" id="rad3" value="visited">
                     <label for="rad3">Відвідав</label>
                 </p>
 
@@ -28,11 +28,12 @@
                 </p>
 
                 <p>
-                    <textarea placeholder="Опис" name="name" required></textarea>
+                    <textarea placeholder="Опис" name="description"></textarea>
                 </p>
 
                 <p>
-                    <input type="date" name="date" required>
+                    <label for="date">Дата: </label>
+                    <input type="date" name="date" id="date" required>
                 </p>
 
                  <div class="flushed-messages">
