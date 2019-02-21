@@ -1,6 +1,8 @@
 .container{
     display: flex;
     justify-content: center;
+    flex-wrap: wrap;
+    flex-basis: 100%;
 }
 
 input[type="text"]{
@@ -17,9 +19,17 @@ input[type="text"]:focus{
     outline: none;
 }
 
-button{
+form button{
     display: inline-block;
     width: 100%;
+	border: none;
+	padding: 8px 10px 8px 10px;
+	border-radius: 5px;
+}
+
+#save-roles{
+    display: inline-block;
+    width: 300px;
 	border: none;
 	padding: 8px 10px 8px 10px;
 	border-radius: 5px;
@@ -86,4 +96,69 @@ textarea{
     width: 100%;
     resize: none;
     height: 100px;
+}
+
+.username h2{
+    text-align:center
+}
+
+.flushed-messages p, span.status{
+    color: rgba(0, 0, 0, 0.33);
+    margin: 0;
+}
+
+
+
+.navbar a, .navbar a:visited, .navbar a:hover, .navbar a:active{
+    -webkit-backface-visibility:hidden;
+            backface-visibility:hidden;
+
+	position:relative;
+    transition:0.5s color ease;
+	text-decoration:none;
+	color: #5cc8d2;
+	font-size: 1.2em;
+}
+.navbar a:hover{
+	color:#d73444;
+}
+
+.navbar span{
+    color: #404643;
+    margin: 0 .5em;
+    font-size: 1.3em;
+}
+
+.users{
+    width: 300px;
+    height: 500px;
+    overflow-y: scroll;
+    text-align: center;
+}
+
+.users button{
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #666666;
+    text-decoration:none;
+    color: #E5DADA;
+    font-size: 1.3em;
+}
+
+.users button:hover{
+    background-color: #666666;
+}
+
+
+.users button.role-0{
+    background-color: #002642;
+}
+
+.users button.role-1{
+    background-color: #5b3f00;
+}
+
+.users button.role-2{
+    background-color: #840032;
 }
