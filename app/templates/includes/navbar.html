@@ -1,0 +1,21 @@
+<div class="container navbar">
+    <a href="{{ url_for('index') }}">Звіт</a>
+    <span>/</span>
+
+    <a href="">Статистика</a>
+
+    {% if current_user.role >= 1 %}
+        <span>/</span>
+        <a href="">Журнал</a>
+    {% endif %}
+
+    {% if current_user.role == 2 %}
+        <span>/</span>
+        <a href="{{ url_for('admin') }}">Адмін-панель</a>
+    {% endif %}
+
+</div>
+
+<div class="container username">
+    <h2>{{ current_user.name }}</h2>
+</div>
