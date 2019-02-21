@@ -1,6 +1,7 @@
 <!doctype html>
 <head lang="ru">
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% block head %}
     {% endblock %}
 
@@ -20,6 +21,11 @@
 
 </head>
 
+<body>
+    {% if current_user.is_authenticated %}
+        {% include 'includes/navbar.html' %}
+    {% endif %}
 
-{% block body %}
-{% endblock %}
+    {% block body %}
+    {% endblock %}
+</body>
