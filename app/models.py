@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from peewee import SqliteDatabase, Model, CharField, TextField, BooleanField, ForeignKeyField, DateField, DateTimeField
+from peewee import SqliteDatabase, Model, CharField, TextField, BooleanField, ForeignKeyField, DateField, DateTimeField, IntegerField
 
+from config import MEMBER
 
 db = SqliteDatabase('app/users.db')
 
@@ -15,6 +16,7 @@ class User(BaseModel):
     name = CharField()
     code = CharField(unique=True)
     authenticated = BooleanField(default=False)
+    role = IntegerField(default=MEMBER)
 
     def is_authenticated(self):
         return self.authenticated
@@ -39,11 +41,11 @@ class OfficialActivity(BaseModel):
 
 
 class Activity(BaseModel):
-    user = ForeignKeyField(User, backref='users')
+    user = ForeignKeyField(User, backref='activities')
     recorded = DateTimeField(default=datetime.now())
 
     date = DateField()
-    name = CharField()
+    name = TextField()
     description = TextField(null=True)
 
 
