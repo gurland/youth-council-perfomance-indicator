@@ -43,6 +43,7 @@ class OfficialActivity(BaseModel):
 class Activity(BaseModel):
     user = ForeignKeyField(User, backref='activities')
     recorded = DateTimeField(default=datetime.now())
+    activity_type = CharField()
 
     date = DateField()
     name = TextField()
