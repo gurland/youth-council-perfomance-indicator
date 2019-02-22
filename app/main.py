@@ -1,7 +1,13 @@
 from functools import wraps
+from datetime import datetime
 
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
+
+from tempfile import NamedTemporaryFile
 from wtforms import Form, StringField, DateField, validators, RadioField
-from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
+from flask import Flask, render_template, redirect, request, url_for, flash, jsonify, send_from_directory
 from flask_login import LoginManager, login_user, current_user
 from peewee import DoesNotExist
 
@@ -103,7 +109,8 @@ def add_activity():
         name, description, activity_type, date = form.name.data, form.description.data, \
                                                  form.activity_type.data, form.date.data
 
-        Activity.create(user=current_user.id, name=name, date=date, description=description)
+        Activity.create(user=current_user.id, name=name, date=date,
+                        description=description, activity_type=activity_type)
 
         flash('Звіт надіслано!')
         return redirect(url_for('index'))
@@ -132,3 +139,105 @@ def save_roles():
                 user.save()
 
         return jsonify({'success': True, 'msg': 'Привілегії змінено!'})
+
+
+@app.route('/stats')
+@login_required()
+def stats():
+    def as_text(value):
+        if value is None:
+            return ""
+        return str(value)
+
+    wb = Workbook()
+    ws = wb.active
+
+    alignment = Alignment(horizontal='general',
+                          vertical='top',
+                          text_rotation=0,
+                          wrap_text=False,
+                          shrink_to_fit=False,
+                          indent=0)
+
+    ws.append(['№', 'ПІБ', 'Організував, провів, зробив', 'Долучився', 'Відвідав',
+               'Чергове засідання', 'Позачергові засідання'])
+
+    users = User.select().order_by(User.name)
+    activities = Activity.select().where(Activity.date.month == datetime.now().month)
+
+    for i, user in enumerate(users):
+        organized = activities.join(User).where((Activity.activity_type == 'organized') &
+                                                (User.name == user.name))
+
+        collaborated = activities.join(User).where((Activity.activity_type == 'collaborated') &
+                                                   (User.name == user.name))
+
+        visited = activities.join(User).where((Activity.activity_type == 'visited') &
+                                              (User.name == user.name))
+
+        organized_str = ""
+        for j, act in enumerate(organized):
+            organized_str += f'{j+1}. {act.name} [{act.date.strftime("%d.%m.%Y")}]'
+
+            if act.description:
+                organized_str += f'\nОпис: {act.description}\n\n'
+            else:
+                organized_str += '\n'
+
+        collaborated_str = ""
+        for j, act in enumerate(collaborated):
+            collaborated_str += f'{j+1}. {act.name} [{act.date.strftime("%d.%m.%Y")}]'
+
+            if act.description:
+                collaborated_str += f'\nОпис: {act.description}\n\n'
+            else:
+                collaborated_str += '\n'
+
+        visited_str = ""
+        for j, act in enumerate(visited):
+            visited_str += f'{j+1}. {act.name} [{act.date.strftime("%d.%m.%Y")}]'
+
+            if act.description:
+                visited_str += f'\nОпис: {act.description}\n\n'
+            else:
+                visited_str += '\n'
+
+        ws.append([str(i+1), user.name, organized_str.strip(),
+                   collaborated_str.strip(), visited_str.strip()])
+
+    for column_cells in ws.columns:
+        max_length = 0
+        for cell in column_cells:
+
+            max_length_of_line_in_cell = max(len(line)
+                                             for line in as_text(cell.value)
+                                             .strip()
+                                             .split('\n'))
+
+            max_length = max(max_length_of_line_in_cell, max_length)
+        ws.column_dimensions[get_column_letter(column_cells[0].column)].width = max_length + 2
+
+    for row_cells in ws.rows:
+        height = max(as_text(cell.value).count('\n') for cell in row_cells)
+        ws.row_dimensions[row_cells[0].row].height = 11*(height+2)
+
+    max_length = 0
+    max_height = 0
+
+    for col in ws.columns:
+        for cell in col:
+            val = as_text(cell.value)
+            cell.alignment = alignment
+
+            # TODO: Add normal autosize
+            max_length = max(len(val), max_length)
+            max_height = max(val.count('\n'), max_height)
+
+    tf = NamedTemporaryFile(suffix='.xlsx', delete=False)
+    wb.save(tf.name)
+    return render_template('stats.html', xlsx_file=tf.name.replace('/tmp/', ''))
+
+
+@app.route('/uploads/<string:filename>')
+def download_file(filename):
+    return send_from_directory('/tmp/', filename, as_attachment=True)
