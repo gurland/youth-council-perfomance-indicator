@@ -2,7 +2,7 @@
     <a href="{{ url_for('index') }}">Звіт</a>
     <span>/</span>
 
-    <a href="">Статистика</a>
+    <a href="{{ url_for('stats') }}">Статистика</a>
 
     {% if current_user.role >= 1 %}
         <span>/</span>
