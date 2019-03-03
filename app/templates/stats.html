@@ -2,6 +2,29 @@
 
 {% block body %}
     <div class="container">
-        <a href="/uploads/{{ xlsx_file }}">Скачати статистику за цей місяць</a>
+        <div class="owl-carousel">
+		  <div class="carousel-item" data-hash="january">Січень</div>
+		  <div class="carousel-item" data-hash="february">Лютий</div>
+		  <div class="carousel-item" data-hash="march">Березень</div>
+		  <div class="carousel-item" data-hash="april">Квітень</div>
+		  <div class="carousel-item" data-hash="may">Травень</div>
+		  <div class="carousel-item" data-hash="june">Червень</div>
+		  <div class="carousel-item" data-hash="july">Липень</div>
+		  <div class="carousel-item" data-hash="august">Серпень</div>
+		  <div class="carousel-item" data-hash="september">Вересень</div>
+		  <div class="carousel-item" data-hash="october">Жовтень</div>
+		  <div class="carousel-item" data-hash="november">Листопад</div>
+		  <div class="carousel-item" data-hash="december">Грудень</div>
+		</div>
+    </div>
+
+    <div class="container">
+        <div class="spoiler" data-spoiler-link="1"></div>
+
+        <div class="spoiler-content" data-spoiler-link="1"></div>
+    </div>
+
+    <div class="container">
+        <a href="#" id="download-xlsx">Скачати статистику за цей місяць</a>
     </div>
 {% endblock %}
