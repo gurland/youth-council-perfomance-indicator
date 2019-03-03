@@ -3,7 +3,7 @@ from datetime import datetime
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
+from openpyxl.styles import Alignment
 
 from tempfile import NamedTemporaryFile
 from wtforms import Form, StringField, DateField, validators, RadioField
@@ -12,7 +12,7 @@ from flask_login import LoginManager, login_user, current_user
 from peewee import DoesNotExist
 
 from models import User, Activity
-from config import MEMBER, MODERATOR, ADMIN, ANY
+from config import ADMIN, ANY, MONTH_NUMBERS
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -141,9 +141,7 @@ def save_roles():
         return jsonify({'success': True, 'msg': 'Привілегії змінено!'})
 
 
-@app.route('/stats')
-@login_required()
-def stats():
+def generate_xlsx(month):
     def as_text(value):
         if value is None:
             return ""
@@ -163,7 +161,7 @@ def stats():
                'Чергове засідання', 'Позачергові засідання'])
 
     users = User.select().order_by(User.name)
-    activities = Activity.select().where(Activity.date.month == datetime.now().month)
+    activities = Activity.select().where(Activity.date.month == month)
 
     for i, user in enumerate(users):
         organized = activities.join(User).where((Activity.activity_type == 'organized') &
@@ -235,7 +233,69 @@ def stats():
 
     tf = NamedTemporaryFile(suffix='.xlsx', delete=False)
     wb.save(tf.name)
-    return render_template('stats.html', xlsx_file=tf.name.replace('/tmp/', ''))
+
+    return tf.name.replace('/tmp/', '')
+
+
+@app.route('/get_xlsx/<string:month_name>')
+@login_required()
+def get_xlsx(month_name):
+    if month_name in MONTH_NUMBERS.keys():
+        filename = generate_xlsx(MONTH_NUMBERS[month_name])
+        return send_from_directory('/tmp/', filename, as_attachment=True)
+    else:
+        return jsonify({'success': False, 'message': 'Помилка'})
+
+
+@app.route('/get_activities/<string:month_name>')
+@login_required()
+def get_stats(month_name):
+    activities = current_user.activities.select().where(Activity.date.month == MONTH_NUMBERS[month_name])
+    response = {'success': True, 'activities': []}
+    for activity in activities:
+        response['activities'].append({
+            'name': activity.name,
+            'date': activity.date,
+            'description': activity.description,
+            'type': activity.activity_type
+        })
+
+    return jsonify(response)
+
+
+@app.route('/update_activity/<int:activity_id>')
+@login_required()
+def update_activity(activity_id):
+    try:
+        activity = Activity.get(id=activity_id)
+    except Activity.DoesNotExist:
+        return jsonify({'success': False, 'message': 'Не знайдено'})
+
+    if activity.user.id != current_user.id:
+        return jsonify({'success': False, 'message': 'Помилка доступу'})
+    else:
+        return jsonify({'success': True, 'message': 'Відредаговано'})
+
+
+@app.route('/delete_activity/<int:activity_id>')
+@login_required()
+def delete_activity(activity_id):
+    try:
+        activity = Activity.get(id=activity_id)
+    except Activity.DoesNotExist:
+        return jsonify({'success': False, 'message': 'Не знайдено'})
+
+    if activity.user.id != current_user.id:
+        return jsonify({'success': False, 'message': 'Помилка доступу'})
+    else:
+        activity.delete_instance()
+        return jsonify({'success': True, 'message': 'Видалено'})
+
+
+@app.route('/stats')
+@login_required()
+def stats():
+    return render_template('stats.html')
 
 
 @app.route('/uploads/<string:filename>')
