@@ -1,0 +1,33 @@
+{% for activity in activities %}
+    <div class="activity">
+        <div class="spoiler" data-spoiler-link="{{ activity.id }}">
+            <div class="spoiler-header">
+                <div class="activity-name">
+                    {{ activity.name }}
+                </div>
+
+                <div class="activity-type">
+                    &nbsp;({{ verbose_type[activity.activity_type] }})&nbsp;
+                </div>
+
+                <div class="header-buttons">
+                    <i class="fas fa-trash-alt"></i>
+                    <i class="fas fa-angle-down"></i>
+                </div>
+            </div>
+        </div>
+        <div class="spoiler-content-wrapper" data-spoiler-link="{{ activity.id }}">
+            <div class="spoiler-content">
+                <b>Назва: </b>{{ activity.name }}
+                <br>
+                <b>Дата: </b>{{ activity.date }}
+                <br>
+                {% if activity.description %}
+                    <b>Опис:</b> {{ activity.description }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+
