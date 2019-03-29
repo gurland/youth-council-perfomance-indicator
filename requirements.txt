@@ -4,3 +4,4 @@ peewee
 celery
 wtforms
 openpyxl
+qrcode[pil]
