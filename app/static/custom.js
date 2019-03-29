@@ -11,28 +11,68 @@ function getRole(el){
     if(el.hasClass('role-0')){
         el.toggleClass('role-0');
         el.toggleClass('role-1');
-        el.attr("user_role", "1");
+        el.attr("data-role", "1");
 
     } else if(el.hasClass('role-1')){
         el.toggleClass('role-1');
         el.toggleClass('role-0');
-        el.attr("user_role", "0");
+        el.attr("data-role", "0");
     }
 }
 
 function owlChanged() {
     let month = window.location.hash.substring(1);
     $('#download-xlsx').attr('href', '/get_xlsx/'+month);
+    let activities = $('.activities');
 
     $.get('/get_activities/'+month, (data) => {
-        console.log(data);
+        activities.html(data);
+        let spoilers = $(".spoiler");
+        spoilers.spoiler({triggerEvents: true, contentClass: 'spoiler-content-wrapper'});
+
+        spoilers.on("jq-spoiler-visible", function(e) {
+            console.log($(e.target).find('.fa-angle-down').toggleClass('fa-angle-down fa-angle-up'));
+        });
+
+
+        spoilers.on("jq-spoiler-hidden", function(e) {
+            console.log($(e.target).find('.fa-angle-up').toggleClass('fa-angle-up fa-angle-down'));
+        });
+
+        $('.fa-trash-alt').click(function (e) {
+            e.stopPropagation();
+
+            let activityId = $(e.target).parent().parent().parent().attr('data-spoiler-link');
+            console.log(activityId);
+
+            if(confirm('Ви точно хочете видалити цей запис?')){
+                $.get('/delete_activity/' + activityId, (data) => {
+                    alert(data.message);
+                    // owl.trigger('change.owl.carousel')
+                    location.reload()
+                });
+            }
+        })
+
     })
+}
+
+function setStatus(msg) {
+    $('.status span').text(msg);
+    setTimeout(function(){
+        $('.status span').text("");
+    }, 3000);
+}
+
+function clearFlashed(){
+    setTimeout(function(){
+        $('.status p').text("");
+    }, 3000)
 }
 
 
 $(() => {
-    $(".spoiler").spoiler();
-
+    clearFlashed();
     let owl = $('.owl-carousel');
 
     owl.owlCarousel({
@@ -60,9 +100,11 @@ $(() => {
         e.preventDefault();
     });
 
-    $('.users button').click((e) => {
+    $('.user').click((e) => {
         let el = $(e.target);
-        console.log(el);
+        if (!el.hasClass('user')){
+            el = el.parent();
+        }
         getRole(el);
     });
 
@@ -78,6 +120,39 @@ $(() => {
         }
     }
 
+//    $('#qrcode img').fancybox();
+
+    $('.get-qrcode').click((e) => {
+        let userId = $(e.target).parent().parent().parent().attr('data-pk');
+        console.log(userId);
+        $.get('/get_qr/' + userId, function (data) {
+            console.log(data);
+
+            $.fancybox.open({
+                src: 'data:image/png;base64, '+data.qrcode,
+                opts: {
+                    caption: data.name + '<br><b>Код: </b>' + data.code
+                }
+            });
+
+        });
+    });
+
+    $('.delete-user').click((e) => {
+        let userId = $(e.target).parent().parent().parent().attr('data-pk');
+        console.log(userId);
+        if (confirm('Точно видалити члена?')){
+            $.get('/delete_user/' + userId, function (data) {
+                setStatus(data.msg);
+                console.log(data)
+                if (data.success){
+                    location.reload()
+                }
+
+            });
+        }
+    });
+
     $('#download-xlsx').click((e) => {
         let link = $(e.target);
         console.log(link)
@@ -85,8 +160,8 @@ $(() => {
 
     $('#save-roles').click(() => {
         let roles = [];
-        $('.users button').each(function () {
-            let userRole = {"_pk": $(this).attr("pk"), "role": $(this).attr("user_role")};
+        $('.user').each(function () {
+            let userRole = {"_pk": $(this).attr("data-pk"), "role": $(this).attr("data-role")};
             roles.push(userRole);
         });
 
@@ -98,12 +173,7 @@ $(() => {
             contentType: 'application/json',
             dataType: 'json',
             success: function (data) {
-                $('span.status').text(data.msg);
-                setTimeout(function(){
-                    $('span.status').text("");
-                }, 3000);
-
-                console.log(data);
+                setStatus(data.msg)
             }
         })
     })

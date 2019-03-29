@@ -5,7 +5,11 @@
     flex-basis: 100%;
 }
 
-input[type="text"]{
+.fancybox-caption__body{
+    font-size: 18px;
+}
+
+.report-form input[type="text"]{
     width: 100%;
     height: 40px;
     border: none;
@@ -14,7 +18,7 @@ input[type="text"]{
 	font-size: 16px;
 }
 
-input[type="text"]:focus{
+.report-form input[type="text"]:focus{
     border-bottom: 1px dashed #3e64c8;
     outline: none;
 }
@@ -29,7 +33,7 @@ form button{
 
 #save-roles{
     display: inline-block;
-    width: 300px;
+    width: 100%;
 	border: none;
 	padding: 8px 10px 8px 10px;
 	border-radius: 5px;
@@ -102,8 +106,9 @@ textarea{
     text-align:center
 }
 
-.flushed-messages p, span.status{
-    color: rgba(0, 0, 0, 0.33);
+.flushed-messages p, .status{
+    font-size: 18px;
+    color: rgb(0, 64, 7);
     margin: 0;
 }
 
@@ -130,37 +135,91 @@ textarea{
 }
 
 .users{
-    width: 300px;
-    height: 500px;
-    overflow-y: scroll;
-    text-align: center;
+    height: 65vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
-.users button{
-    display: block;
-    width: 100%;
+.user{
     padding: 10px;
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+}
+
+.users .user{
+    display: flex;
+    width: 100%;
     border: 1px solid #666666;
     text-decoration:none;
     color: #E5DADA;
     font-size: 1.3em;
 }
 
-.users button:hover{
-    background-color: #666666;
+.user-buttons{
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.user a{
+    color: #E5DADA;
+}
+
+.user a:hover{
+    color: #666666;
+}
+
+.user a:active{
+    color: #4b0022;
 }
 
 
-.users button.role-0{
+.user.role-0{
     background-color: #002642;
 }
 
-.users button.role-1{
+.user.role-1{
     background-color: #5b3f00;
 }
 
-.users button.role-2{
+.user.role-2{
     background-color: #840032;
+}
+
+#qrcode{
+    width: 50%;
+    height: 50%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    display: none;
+}
+
+#qrcode img{
+  max-width:50%;
+  max-height:50%;
+}
+
+.add-user{
+    margin-bottom: 15px;
+}
+
+.add-user input[type="text"]{
+    border: 1px solid #3e64c8;
+    width: 100%;
+    height: 40px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 20px;
+}
+
+.add-user input[type="text"]:focus{
+    border: 1px dashed #3e64c8;
+    outline: none;
 }
 
 .owl-carousel{
@@ -195,5 +254,102 @@ textarea{
     .owl-nav {
        display: none;
     }
+}
 
+@media (min-width: 620px) {
+    .activities{
+        width: 600px;
+    }
+}
+
+@media (max-width: 620px) {
+    .activities{
+        width: 100%;
+    }
+}
+
+@media (min-width: 480px) {
+    .add-user{
+        width: 480px;
+    }
+    .users{
+        width: 480px;
+    }
+
+    #save-roles{
+        width: 480px;
+    }
+}
+
+@media (max-width: 480px) {
+    .users{
+        width: 100%;
+    }
+
+    .add-user{
+        width: 100%;
+    }
+
+    #save-roles{
+        width: 100%;
+    }
+}
+
+
+
+.activities .spoiler, .activities .spoiler-content-wrapper{
+    width: 100%;
+}
+
+.activity{
+    margin-bottom: 20px;
+}
+
+.spoiler{
+    cursor: pointer;
+    border-radius: 25px 25px 0 0;
+    background-color: rgba(212, 233, 251, 0.44);
+
+    border-top: 1px solid #000000;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #989898;
+    border-left: 1px solid #000000;
+}
+
+.spoiler-header{
+    margin: 10px;
+    display: flex;
+}
+
+.spoiler-header .activity-name{
+    white-space: nowrap;
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    max-width: 430px;
+}
+
+.spoiler-header .activity-type{
+    font-weight: bold;
+}
+
+.spoiler-header .header-buttons{
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.spoiler-content-wrapper{
+    transition: height 0.5s ease-out;
+    background-color: rgba(226, 243, 245, 0.33);
+
+    border-top: 0 solid #000000;
+    border-right: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    border-left: 1px solid #000000;
+
+}
+
+.spoiler-content{
+    margin: 10px;
+    /*display: flex;*/
 }
