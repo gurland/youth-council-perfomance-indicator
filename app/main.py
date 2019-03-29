@@ -1,5 +1,6 @@
 from functools import wraps
-from datetime import datetime
+from base64 import b64encode
+import io
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -7,7 +8,7 @@ from openpyxl.styles import Alignment
 
 from tempfile import NamedTemporaryFile
 from wtforms import Form, StringField, DateField, validators, RadioField
-from flask import Flask, render_template, redirect, request, url_for, flash, jsonify, send_from_directory
+from flask import Flask, render_template, redirect, request, url_for, flash, jsonify, send_from_directory, send_file
 from flask_login import LoginManager, login_user, current_user
 from peewee import DoesNotExist
 
@@ -32,6 +33,10 @@ class ActivityForm(Form):
                                         ('visited', 'Відвідав')])
 
     date = DateField('Дата', [validators.DataRequired()])
+
+
+class UserForm(Form):
+    name = StringField('Ім`я', [validators.DataRequired()])
 
 
 def login_required(role=ANY):
@@ -124,6 +129,49 @@ def add_activity():
 @login_required(ADMIN)
 def admin():
     return render_template('admin.html', users=User.select().order_by(User.name))
+
+
+@app.route('/add_user', methods=['POST'])
+@login_required(ADMIN)
+def add_user():
+    form = UserForm(request.form)
+    if form.validate():
+        name = form.name.data
+
+        User.create(name=name, code=User.generate_code())
+
+        flash('Користувач доданий!')
+        return redirect(url_for('admin'))
+
+    else:
+        flash('Невірно заповнена форма')
+        return redirect(url_for('admin'))
+
+
+@app.route('/delete_user/<int:user_id>')
+@login_required()
+def delete_user(user_id):
+    try:
+        user = User.get(id=user_id)
+        user.delete_instance()
+        flash('Члена видалено!')
+        return jsonify({'success': True, 'message': 'Члена видалено!'})
+
+    except User.DoesNotExist:
+        return jsonify({'success': False, 'message': 'Не знайдено'})
+
+
+@app.route('/get_qr/<int:user_id>')
+@login_required(ADMIN)
+def get_qr(user_id):
+    try:
+        user = User.get(id=user_id)
+        qrcode = user.get_qrcode()
+
+        return jsonify({'success': True, 'qrcode': b64encode(qrcode).decode('ascii'), 'code': user.code, 'name': user.name})
+
+    except User.DoesNotExist:
+        return jsonify({'success': False, 'msg': 'Такого користувача не існує!'})
 
 
 @app.route('/save_roles', methods=['POST'])
@@ -250,31 +298,15 @@ def get_xlsx(month_name):
 @app.route('/get_activities/<string:month_name>')
 @login_required()
 def get_stats(month_name):
-    activities = current_user.activities.select().where(Activity.date.month == MONTH_NUMBERS[month_name])
-    response = {'success': True, 'activities': []}
-    for activity in activities:
-        response['activities'].append({
-            'name': activity.name,
-            'date': activity.date,
-            'description': activity.description,
-            'type': activity.activity_type
-        })
+    activities = current_user.activities.select()\
+        .where(Activity.date.month == MONTH_NUMBERS[month_name])\
+        .order_by(Activity.date.desc())
 
-    return jsonify(response)
-
-
-@app.route('/update_activity/<int:activity_id>')
-@login_required()
-def update_activity(activity_id):
-    try:
-        activity = Activity.get(id=activity_id)
-    except Activity.DoesNotExist:
-        return jsonify({'success': False, 'message': 'Не знайдено'})
-
-    if activity.user.id != current_user.id:
-        return jsonify({'success': False, 'message': 'Помилка доступу'})
-    else:
-        return jsonify({'success': True, 'message': 'Відредаговано'})
+    return render_template('dynamic/activities.html', activities=activities, verbose_type={
+        'organized': 'Організував',
+        'collaborated': 'Долучився',
+        'visited': 'Відвідав'
+    })
 
 
 @app.route('/delete_activity/<int:activity_id>')
