@@ -7,7 +7,7 @@
 {% block body %}
     <div class="container">
         <div class="send-report">
-            <form action="{{ url_for('add_activity') }}" method="post">
+            <form class="report-form" action="{{ url_for('add_activity') }}" method="post">
                 <p>
                     <input type="radio" name="activity_type" value="organized" id="rad1" checked>
                     <label for="rad1">Організував, провів, зробив</label>
@@ -42,7 +42,7 @@
                             {{message}}
                         </p>
                     {% endfor %}
-                </div>
+                 </div>
 
                 <br><button type="submit">Надіслати звіт</button>
             </form>

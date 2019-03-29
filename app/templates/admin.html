@@ -3,23 +3,44 @@
 {% block body %}
 
     <div class="container">
-        <div class="users">
-            {% for user in users %}
-                <button class="role-{{ user.role }}" user_role="{{ user.role }}" pk="{{ user.id }}">
-                    {{ user.name }}
-                </button>
+        <div class="status">
+            <span></span>
+            {% for message in get_flashed_messages() %}
+                <p>
+                    {{message}}
+                </p>
             {% endfor %}
         </div>
-    </div>
 
-    <div class="container">
-        <span class="status">
-
-        </span>
+        <form class="add-user" action="{{ url_for('add_user') }}" method="post">
+            <input name="name" type="text" placeholder="Додати члена" required>
+            <button><i class="fas fa-user-plus"></i></button>
+        </form>
     </div>
 
     <div class="container">
         <button id="save-roles">Зберегти</button>
     </div>
+    <div class="container">
+        <div class="users">
+
+            {% for user in users %}
+                <div class="user role-{{ user.role }}" data-role="{{ user.role }}" data-pk="{{ user.id }}">
+
+                    <div class="user-name">{{ user.name }}</div>
+                    <div class="user-buttons">
+                        <a class="get-qrcode"><i class="fas fa-qrcode"></i></a>
+                        <a class="delete-user"><i class="fas fa-trash-alt"></i></a>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    </div>
+
+
 
 {% endblock %}
